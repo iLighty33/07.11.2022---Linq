@@ -16,6 +16,7 @@ namespace _07._11._2022___Linq
         static void Main(string[] args)
         {
             // Task 1
+            Console.WriteLine("Задание 1: ");
             Console.Write("Введите дату начала недели: ");
             int counter = 0;
 
@@ -35,7 +36,6 @@ namespace _07._11._2022___Linq
 
             // Создадим массив объектов типа myTemp
             var _myTemperatureArray = new List<myTemp>();
-
 
             var MyTemperature = new TextIO("myTemperature.txt");
             var _myTemperature = new List<string>();
@@ -83,10 +83,6 @@ namespace _07._11._2022___Linq
 
                         var temp0 = counter;
 
-                        Console.WriteLine($"\nНомер недели: {counter}");
-                        Console.WriteLine($"День недели: {_tmp[0]}");
-                        Console.WriteLine($"Температура: {_tmp2[0]}");
-
                         // Заполним наш массив объектами
 
                         myTemp myTemperatureArr = new myTemp(counter, temp1, temp2);
@@ -112,7 +108,7 @@ namespace _07._11._2022___Linq
                            where item._myTemperature <= -9
                            select item;
 
-            Console.WriteLine("\n");
+            Console.WriteLine();
 
             foreach (var item in mostHot)
             {
@@ -124,9 +120,10 @@ namespace _07._11._2022___Linq
                 Console.WriteLine($"Самая холодная погода. Неделя №: {item._numberOfWeek}, день недели: {item._dayOfWeek}, температура: {item._myTemperature}");
             }
 
-            Console.ReadKey();
+            //Console.ReadKey();
 
             // Task 2
+            Console.WriteLine("\nЗадание 2: ");
 
             var MyText1 = new TextIO("myText1.txt");
             var MyText2 = new TextIO("myText2.txt");
@@ -134,8 +131,8 @@ namespace _07._11._2022___Linq
             var _myText1 = new List<string>();
             var _myText2 = new List<string>();
 
-            var _myTextObjects1 = new List<myText>();
-            var _myTextObjects2 = new List<myText>();
+            List<string> _myTextObjects1 = new List<string>();
+            List<string> _myTextObjects2 = new List<string>();
 
             var _Mytext1 = new TextAnalyzer();
             var _Mytext2 = new TextAnalyzer();
@@ -161,113 +158,51 @@ namespace _07._11._2022___Linq
             foreach (var item in _myText1)
             {
 
-                // Удалим пробелы, точки и запятые из текста.
+                // Удалим пробелы, точки, двоеточия и запятые из текста. Заполним нашу коллекцию
 
-                char[] separators = new char[] { ' ', '.', ',' };
+                char[] separators = new char[] { ' ', '.', ',', ':' };
                 string[] subs = item.Split(separators, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var sub in subs)
                 {
-                    Console.WriteLine($"Substring: {sub}");
                     _Mytext1.Search(sub, myText1Regex, out _tmpText);
+                    _myTextObjects1.Add(sub.ToString().ToLower());
                     wordCounterText1++;
                 }
 
-                try
-                {
-
-                    try
-                    {
-                        MatchCollection matches = myText1.Matches(_myText1.ToString());
-                        _Mytext1.Search(matchMyText1[0].ToString(), myText1Regex, out _tmpText);
-
-                        var temp1 = _tmpText[0].ToString();
-
-                        Console.WriteLine($"\nТекст 1: {_tmpText[0]}");
-
-                        // Заполним наш массив объектами
-
-                        myText myText1Arr = new myText(temp1);
-                        _myTextObjects1.Add(myText1Arr);
-
-                    }
-                    catch
-                    {
-                    }
-
-                }
-                catch
-                {
-                    Console.WriteLine($"Cтрока № {counter}: совпадений нет");
-                }
             }
 
             foreach (var item in _myText2)
             {
 
-                // Удалим пробелы, точки и запятые из текста.
+                // Удалим пробелы, точки, двоеточия и запятые из текста. Заполним нашу коллекцию
 
-                char[] separators = new char[] { ' ', '.', ',' };
+                char[] separators = new char[] { ' ', '.', ',', ':' };
                 string[] subs = item.Split(separators, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var sub in subs)
                 {
-                    Console.WriteLine($"Substring: {sub}");
-                    //_Mytext1.Search(sub, myText1Regex, out _tmpText);
                     _Mytext2.Search(sub, myText2Regex, out _tmpText2);
+                    _myTextObjects2.Add(sub.ToString().ToLower());
                     wordCounterText2++;
-                }
-
-                try
-                {
-
-                    try
-                    {
-
-                        MatchCollection matches2 = myText2.Matches(_myText2.ToString());
-                        _Mytext2.Search(matchMyText2[0].ToString(), myText2Regex, out _tmpText2);
-
-                        var temp2 = _tmpText2[0].ToString();
-
-                        Console.WriteLine($"Текст 2: {_tmpText2[0]}");
-
-
-                        // Заполним наш массив объектами
-
-                        myText myText2Arr = new myText(temp2);
-                        _myTextObjects1.Add(myText2Arr);
-
-                    }
-                    catch
-                    {
-                    }
-
-                }
-                catch
-                {
-                    Console.WriteLine($"Cтрока № {counter}: совпадений нет");
                 }
             }
 
             Console.WriteLine($"Количество слов в тексте 1: {wordCounterText1}");
             Console.WriteLine($"Количество слов в тексте 2: {wordCounterText2}");
 
-            var _myMatches = new List<myText>();
+            List<string> _myMatches = new List<string>();
 
+            _myMatches = _myTextObjects1.Intersect(_myTextObjects2).ToList();
 
-            foreach (var item in _myTextObjects2)
-            {
-                if (_myTextObjects1.Equals(_myTextObjects2))
-                {
-                    _myMatches.Add(item);
-                    Console.WriteLine(item);
-                }
-            }
+            //var result = _myTextObjects1.GroupBy(g => g).Where(g => g.Count() > 1).Select(g => g.Key);
+            var result = _myMatches.GroupBy(g => g).Select(g => new {Matches = g.Key, Count = g.Count()}).ToList();
+            result.ForEach(x => Console.WriteLine(x));
 
-            var result = _myTextObjects1.GroupBy(g => g).Where(g => g.Count() > 1).Select(g => g.Key);
+            var wr = new StreamWriter("result.txt", false);
+            result.ForEach(x => wr.WriteLine(x));
+            wr.Close();
 
-            File.WriteAllText("result.txt", result.ToString()); Console.WriteLine("Записано");
-
+            Console.WriteLine("Записано");
             Console.ReadKey();
         }
-        
     }
 }
